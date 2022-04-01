@@ -52,3 +52,4 @@ name you want to assign to your new node
 ```
 kubectl get nodes
 ```
+14. Download [Rancher Desktop](https://docs.rancherdesktop.io/getting-started/installation).
