@@ -1,8 +1,17 @@
 # Raspberry Pi Local Services Cluster
 ## Overview
+This repo contains scripts and instructions on how to set up a K3s cluster on Raspberry Pis. The cluster will run
+services that can replace Internet-based applications. Inspiration was drawn from my work for 
+[iNethi](https://www.inethi.org.za/). You can find the full Docker-based iNethi local services repo 
+[here](https://github.com/iNethi/master-builder).
 ## Equipment
-## Preparation (headless installation)
-### Prerequisites
+1. Two or more Raspberry Pi 4s
+2. A network switch
+3. Ethernet cables (you can do it over WiFi but this guide is done over Ethernet)
+4. An access point
+5. A Pfsense firewall (optional)
+## Preparation
+### Configure Raspberry Pis
 1. Flash your SD cards with Raspbian Pi OS Lite (32-bit)
 2. Insert the SD cards into the Pis and boot them. Let them boot (wait a few minutes). Turn off the Pis and remove the
 SD cards.
@@ -69,4 +78,35 @@ name you want to assign to your new node
 kubectl get nodes
 ```
 #### Install and set up Rancher
-1. Download [Rancher Desktop](https://docs.rancherdesktop.io/getting-started/installation).
+1. Download [virtual box](https://www.virtualbox.org/) and create and [Ubuntu server](https://ubuntu.com/download/server) 
+VM.
+2. ssh into your vm, become root and create the following directories:
+```
+mkdir /etc/rancher
+mkdir /etc/rancher/rke2
+```
+3. Create a config file:
+```
+cd /etc/rancher/rke2
+nano config.yaml
+```
+and add the following:
+```
+token: mysecrettoken
+tls-san:
+    - 192.168.68.200
+```
+where ```token``` is any random secret token and the ip address you enter is the ip of your VM
+4. Enable the rancher service using systemclt:
+```
+systemctl enable rancherd-server.service
+systemctl start rancherd-server.service
+```
+wait for the service to start. You can monitor it using the following:
+```
+journalctl -eu rancherd-server -f
+```
+5. Reset the admin password:
+```
+rancherd reset-admin
+```
